@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tweetivity</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=GeistMono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- UPLOAD SCREEN -->
+  <div id="upload-screen" class="screen active">
+    <div class="upload-hero">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <span>Tweetivity</span>
+      </div>
+      <h1>Your X activity,<br/><em>visualized.</em></h1>
+      <p class="subtitle">Upload your X analytics CSV to see your heatmap, streaks, top tweets and engagement trends - all in your browser, zero data sent anywhere.</p>
+
+      <div class="how-to">
+        <div class="step"><span class="step-num">1</span><span>Go to <strong>analytics</strong></span></div>
+        <div class="step"><span class="step-num">2</span><span>Click <strong>Export data</strong> → Download CSV</span></div>
+        <div class="step"><span class="step-num">3</span><span>Drop the file below</span></div>
+      </div>
+
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept=".csv" />
+        <div class="drop-inner">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4m0 0L8 8m4-4l4 4"/></svg>
+          <p>Drop your CSV here</p>
+          <span>or click to browse</span>
+        </div>
+      </div>
+
+      <button class="demo-btn" id="demo-btn">Try with demo data</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboard-screen" class="screen">
+    <header class="dash-header">
+      <div class="dash-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <span>Tweetivity</span>
+      </div>
+      <div class="dash-meta">
+        <span id="dash-date-range"></span>
+        <button class="share-btn" id="share-map-btn" type="button" aria-label="Share my map">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Share my map</span>
+        </button>
+        <button class="reset-btn" id="reset-btn">Upload new file</button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+
+      <!-- STAT CARDS -->
+      <section class="stat-cards" id="stat-cards">
+        <div class="stat-card">
+          <div class="stat-label">Total Tweets</div>
+          <div class="stat-value" id="s-tweets">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Impressions</div>
+          <div class="stat-value" id="s-impressions">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Engagements</div>
+          <div class="stat-value" id="s-engagements">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Eng. Rate</div>
+          <div class="stat-value" id="s-engrate">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Max Streak</div>
+          <div class="stat-value" id="s-streak">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Most Active Day</div>
+          <div class="stat-value" id="s-activeday">—</div>
+        </div>
+        <div class="stat-card peak-hour-card">
+          <div class="stat-label">Peak Hour</div>
+          <div class="stat-value" id="s-peakhour">—</div>
+        </div>
+        <div class="stat-card most-posted-day-card">
+          <div class="stat-label">Most Posted Date</div>
+          <div class="stat-value" id="s-postday">—</div>
+        </div>
+        <div class="stat-card total-likes-card">
+          <div class="stat-label">Total Likes</div>
+          <div class="stat-value" id="s-likes">—</div>
+        </div>
+      </section>
+
+      <!-- HEATMAP -->
+      <section class="panel heatmap-panel" id="heatmap-panel">
+        <div class="panel-header">
+          <h2>Tweetivity map</h2>
+          <div class="heatmap-head-meta">
+            <div class="heatmap-summary">
+              <span>Total active days: <strong id="heatmap-active-days">0</strong></span>
+              <span>Max streak: <strong id="heatmap-max-streak">0</strong></span>
+            </div>
+            <div class="heatmap-legend">
+              <span>Less</span>
+              <div class="legend-cells">
+                <div class="legend-cell l0"></div>
+                <div class="legend-cell l1"></div>
+                <div class="legend-cell l2"></div>
+                <div class="legend-cell l3"></div>
+                <div class="legend-cell l4"></div>
+              </div>
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+        <div class="heatmap-wrap">
+          <div class="heatmap-months" id="heatmap-months"></div>
+          <div class="heatmap-body">
+            <div class="heatmap-days">
+              <span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span>Sun</span>
+            </div>
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+          </div>
+        </div>
+        <div class="tooltip" id="heatmap-tooltip"></div>
+      </section>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-row">
+        <section class="panel chart-panel">
+          <div class="panel-header"><h2>Impressions over time</h2></div>
+          <div class="chart-wrap"><canvas id="impressions-chart"></canvas></div>
+        </section>
+        <section class="panel chart-panel">
+          <div class="panel-header"><h2>Engagement rate trend</h2></div>
+          <div class="chart-wrap"><canvas id="engrate-chart"></canvas></div>
+        </section>
+      </div>
+
+      <!-- HOUR + DAY BREAKDOWN -->
+      <div class="charts-row">
+        <section class="panel chart-panel">
+          <div class="panel-header"><h2>Reach efficiency over time</h2></div>
+          <div class="chart-wrap"><canvas id="hour-chart"></canvas></div>
+        </section>
+        <section class="panel chart-panel">
+          <div class="panel-header"><h2>Reach by day of week</h2></div>
+          <div class="chart-wrap"><canvas id="dow-chart"></canvas></div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/parse.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/heatmap.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
